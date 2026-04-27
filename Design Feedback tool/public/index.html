@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Design Feedback</title>
+<style>
+body { font-family: system-ui; background: linear-gradient(135deg, #667eea, #764ba2); min-height: 100vh; padding: 40px; }
+.container { max-width: 1200px; margin: 0 auto; }
+.card { background: white; border-radius: 12px; padding: 30px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+.upload-area { border: 2px dashed #667eea; padding: 40px; text-align: center; cursor: pointer; background: #f8f9ff; border-radius: 8px; }
+.form-group { margin-bottom: 18px; }
+label { display: block; font-weight: 600; margin-bottom: 6px; }
+input, textarea, select { width: 100%; padding: 10px; border: 1px solid #e0e0e0; border-radius: 6px; font-family: inherit; }
+button { padding: 14px; background: linear-gradient(135deg, #667eea, #764ba2); color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; width: 100%; margin-top: 10px; }
+button:disabled { opacity: 0.6; }
+.feedback { display: none; }
+.feedback.active { display: block; }
+.loading { text-align: center; padding: 40px; }
+.spinner { display: inline-block; width: 40px; height: 40px; border: 4px solid #f0f0f0; border-top-color: #667eea; border-radius: 50%; animation: spin 1s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.error { background: #fee; color: #c33; padding: 16px; border-radius: 6px; margin-bottom: 20px; }
+.feedback-content { line-height: 1.8; color: #333; }
+</style>
+</head>
+<body>
+<div class="container">
+<header style="text-align: center; color: white; margin-bottom: 40px;">
+<h1>Design Feedback Analyzer</h1>
+<p>Expert design critique powered by Claude AI</p>
+</header>
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px;">
+<div class="card">
+<h2>Upload Design</h2>
+<div class="upload-area" id="uploadArea">Click to upload or drag and drop</div>
+<input type="file" id="imageInput" accept="image/png,image/jpeg" style="display: none;">
+<div style="margin-top: 20px;">
+<div class="form-group">
+<label>Target Audience</label>
+<input type="text" id="audience">
+</div>
+<div class="form-group">
+<label>Platform</label>
+<select id="platform"><option></option><option value="mobile">Mobile</option><option value="web">Web</option></select>
+</div>
+<button id="analyzeButton" disabled>Analyze Design</button>
+</div>
+</div>
+<div class="card" id="feedbackCard">
+<h2>Analysis</h2>
+<div id="feedbackContent"></div>
+</div>
+</div>
+<div class="card feedback" id="feedbackSection">
+<h2>Feedback</h2>
+<div id="detailedFeedback"></div>
+<button id="resetBtn">Analyze Another</button>
+</div>
+</div>
+<script>
+let uploadedImage = null, uploadedImageBase64 = null;
+const uploadArea = document.getElementById("uploadArea");
+const imageInput = document.getElementById("imageInput");
+const analyzeButton = document.getElementById("analyzeButton");
+uploadArea.addEventListener("click", () => imageInput.click());
+uploadArea.addEventListener("drop", e => { e.preventDefault(); if(e.dataTransfer.files[0]) handleImage(e.dataTransfer.files[0]); });
+uploadArea.addEventListener("dragover", e => e.preventDefault());
+imageInput.addEventListener("change", e => { if(e.target.files[0]) handleImage(e.target.files[0]); });
+function handleImage(file) {
+  if(!file.type.match("image/(png|jpeg)")) { alert("PNG/JPG only"); return; }
+  if(file.size > 10*1024*1024) { alert("Max 10MB"); return; }
+  uploadedImage = file;
+  const reader = new FileReader();
+  reader.onload = e => {
+    uploadedImageBase64 = e.target.result.split(",")[1];
+    document.getElementById("feedbackCard").style.display = "block";
+  };
+  reader.readAsDataURL(file);
+  updateButton();
+}
+analyzeButton.addEventListener("click", analyze);
+document.getElementById("audience").addEventListener("input", updateButton);
+document.getElementById("platform").addEventListener("change", updateButton);
+function updateButton() {
+  analyzeButton.disabled = !(uploadedImage && document.getElementById("audience").value && document.getElementById("platform").value);
+}
+async function analyze() {
+  const feedbackCard = document.getElementById("feedbackCard");
+  const content = document.getElementById("feedbackContent");
+  content.innerHTML = "<div class=\"loading\"><div class=\"spinner\"></div><p>Analyzing...</p></div>";
+  try {
+    const res = await fetch("/api/analyze", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        imageBase64: uploadedImageBase64,
+        mediaType: uploadedImage.type,
+        audience: document.getElementById("audience").value,
+        platform: document.getElementById("platform").value,
+        purpose: "",
+        goal: "",
+        explanation: ""
+      })
+    });
+    if(!res.ok) throw new Error((await res.json()).error);
+    const data = await res.json();
+    document.getElementById("detailedFeedback").innerHTML = data.feedback.split("\n").map(l => "<p>" + l + "</p>").join("");
+    document.getElementById("feedbackSection").classList.add("active");
+    feedbackCard.style.display = "none";
+  } catch(e) {
+    content.innerHTML = "<div class=\"error\">Error: " + e.message + "</div>";
+  }
+}
+document.getElementById("resetBtn").addEventListener("click", () => { uploadedImage = null; uploadedImageBase64 = null; document.getElementById("feedbackSection").classList.remove("active"); document.getElementById("feedbackCard").style.display = "none"; document.getElementById("audience").value = ""; document.getElementById("platform").value = ""; imageInput.value = ""; updateButton(); window.scrollTo(0, 0); });
+updateButton();
+</script>
+</body>
+</html>

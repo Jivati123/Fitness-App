@@ -1,0 +1,784 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fitness Challenge - Find Your Score</title>
+    <style>
+        /* ── Color Tokens ─────────────────────────────────────────── */
+        :root {
+            --bg-primary:   #F7F5F2;
+            --bg-card:      #FFFFFF;
+            --bg-alt:       #EFEAE4;
+            --text-primary: #2E2E2E;
+            --text-sec:     #6B6B6B;
+            --text-dim:     #A0A0A0;
+            --cta:          #FF7A00;
+            --cta-hover:    #E66A00;
+            --cta-text:     #FFFFFF;
+            --accent-soft:  #FFD9B3;
+            --highlight:    #FFC107;
+            --border:       #E4DDD5;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg-primary);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container { max-width: 600px; margin: 0 auto; }
+
+        /* ── Header ─────────────────────────────────────────────── */
+        header {
+            margin-bottom: 24px;
+            margin-top: 20px;
+        }
+
+        /* Row 1: lang toggle right-aligned */
+        .header-top {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 16px;
+        }
+
+        /* Row 2: title + subtitle centered */
+        .header-body {
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 2.4em;
+            font-weight: 800;
+            color: var(--text-primary);
+            margin-bottom: 6px;
+            letter-spacing: -0.5px;
+        }
+
+        .subtitle {
+            font-size: 1.05em;
+            color: var(--text-sec);
+        }
+
+        /* ── Language Toggle ─────────────────────────────────────── */
+        .lang-toggle {
+            display: flex;
+            background: var(--bg-alt);
+            border-radius: 30px;
+            padding: 4px;
+            gap: 4px;
+            border: 1px solid var(--border);
+        }
+
+        .lang-btn {
+            padding: 7px 18px;
+            border: none;
+            border-radius: 24px;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 0.88em;
+            transition: all 0.25s;
+            background: transparent;
+            color: var(--text-sec);
+        }
+
+        .lang-btn.active {
+            background: var(--cta);
+            color: var(--cta-text);
+            box-shadow: 0 2px 8px rgba(255,122,0,0.3);
+        }
+
+        .lang-btn:not(.active):hover {
+            background: var(--accent-soft);
+            color: var(--cta);
+        }
+
+        /* ── Progress Bar ────────────────────────────────────────── */
+        .progress-bar {
+            height: 6px;
+            background: var(--bg-alt);
+            border-radius: 10px;
+            margin: 0 0 28px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--cta);
+            width: 0%;
+            transition: width 0.4s ease;
+            border-radius: 10px;
+        }
+
+        /* ── Card ────────────────────────────────────────────────── */
+        .card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 36px;
+            box-shadow: 0 4px 24px rgba(46,46,46,0.08);
+            margin-bottom: 30px;
+            border: 1px solid var(--border);
+        }
+
+        /* ── Quiz Sections ───────────────────────────────────────── */
+        .question-section { display: none; }
+        .question-section.active { display: block; animation: slideIn 0.3s ease; }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(12px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        .question-number {
+            font-size: 0.8em;
+            font-weight: 700;
+            color: var(--cta);
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin-bottom: 10px;
+        }
+
+        .question-title {
+            font-size: 1.35em;
+            color: var(--text-primary);
+            margin-bottom: 24px;
+            font-weight: 700;
+            line-height: 1.45;
+        }
+
+        .options { display: flex; flex-direction: column; gap: 11px; }
+
+        .option {
+            padding: 14px 18px;
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.25s;
+            background: var(--bg-card);
+            font-size: 0.97em;
+            font-weight: 500;
+            color: var(--text-primary);
+            text-align: left;
+        }
+
+        .option:hover {
+            border-color: var(--cta);
+            background: #FFF5ED;
+        }
+
+        .option.selected {
+            border-color: var(--cta);
+            background: var(--cta);
+            color: var(--cta-text);
+        }
+
+        /* ── Lead Form ───────────────────────────────────────────── */
+        .lead-form { display: none; }
+        .lead-form.active { display: block; animation: slideIn 0.3s ease; }
+
+        .form-group { margin-bottom: 20px; }
+
+        label {
+            display: block;
+            margin-bottom: 7px;
+            font-weight: 600;
+            color: var(--text-primary);
+            font-size: 0.95em;
+        }
+
+        .phone-input-group { display: flex; gap: 10px; }
+
+        .country-select {
+            width: 120px;
+            padding: 12px;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            font-size: 1em;
+            cursor: pointer;
+            background: var(--bg-card);
+            color: var(--text-primary);
+        }
+
+        .country-select:focus { outline: none; border-color: var(--cta); }
+
+        input[type="text"],
+        input[type="tel"] {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            font-size: 1em;
+            transition: border 0.25s;
+            width: 100%;
+            background: var(--bg-card);
+            color: var(--text-primary);
+        }
+
+        input[type="text"]::placeholder,
+        input[type="tel"]::placeholder { color: var(--text-dim); }
+
+        input[type="text"]:focus,
+        input[type="tel"]:focus { outline: none; border-color: var(--cta); box-shadow: 0 0 0 3px rgba(255,122,0,0.12); }
+
+        .error { color: #D94F3D; font-size: 0.84em; margin-top: 5px; }
+
+        /* ── Buttons ─────────────────────────────────────────────── */
+        .btn {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.05em;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.25s;
+            margin-top: 20px;
+        }
+
+        .btn-primary {
+            background: var(--cta);
+            color: var(--cta-text);
+        }
+
+        .btn-primary:hover {
+            background: var(--cta-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255,122,0,0.35);
+        }
+
+        /* ── Score / Result ──────────────────────────────────────── */
+        .result-section { display: none; text-align: center; }
+        .result-section.active { display: block; animation: slideIn 0.3s ease; }
+
+        .score-circle {
+            width: 150px;
+            height: 150px;
+            margin: 0 auto 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3em;
+            font-weight: 800;
+            color: var(--cta-text);
+            background: var(--cta);
+            box-shadow: 0 12px 32px rgba(255,122,0,0.4);
+            animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes popIn {
+            from { transform: scale(0.5); opacity: 0; }
+            to   { transform: scale(1); opacity: 1; }
+        }
+
+        .score-label { font-size: 1.3em; color: var(--text-primary); margin-bottom: 10px; font-weight: 700; }
+        .score-sub   { color: var(--text-sec); font-size: 1em; margin-bottom: 20px; }
+
+        /* ── Step indicator ──────────────────────────────────────── */
+        .step-indicator {
+            text-align: center;
+            color: var(--text-dim);
+            font-size: 0.88em;
+            margin-top: 20px;
+        }
+
+        /* ── Nav Buttons ─────────────────────────────────────────── */
+        .nav-buttons { display: flex; gap: 10px; margin-top: 28px; }
+
+        .btn-back {
+            flex: 1;
+            background: var(--bg-card);
+            color: var(--cta);
+            border: 2px solid var(--cta);
+            margin-top: 0;
+        }
+
+        .btn-back:hover { background: #FFF5ED; }
+        .btn-next { flex: 2; margin-top: 0; }
+
+        /* ── Success ─────────────────────────────────────────────── */
+        .success-message { display: none; text-align: center; }
+        .success-message.active { display: block; animation: slideIn 0.3s ease; }
+
+        /* ── Hindi font ──────────────────────────────────────────── */
+        .lang-hi .question-title,
+        .lang-hi .option,
+        .lang-hi label,
+        .lang-hi .btn,
+        .lang-hi .score-label,
+        .lang-hi .score-sub,
+        .lang-hi .step-indicator,
+        .lang-hi .subtitle {
+            font-family: 'Noto Sans Devanagari', 'Mangal', sans-serif;
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <!-- Row 1: Language toggle (right-aligned, never overlaps title) -->
+            <div class="header-top">
+                <div class="lang-toggle">
+                    <button class="lang-btn active" id="btnEn" onclick="setLang('en')">EN</button>
+                    <button class="lang-btn" id="btnHi" onclick="setLang('hi')">हिंदी</button>
+                </div>
+            </div>
+            <!-- Row 2: Title & subtitle centered below -->
+            <div class="header-body">
+                <h1>💪 <span id="headerTitle">Fitness Challenge</span></h1>
+                <p class="subtitle" id="headerSubtitle">Discover your fitness score in 60 seconds</p>
+            </div>
+        </header>
+
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+
+        <div class="card">
+            <!-- Lead Form (SHOWN FIRST) -->
+            <div class="lead-form active" id="leadForm">
+                <div style="margin-bottom: 20px;">
+                    <p id="formStepLabel" style="color: var(--text-sec); font-size: 0.95em; text-align: center;"></p>
+                </div>
+                <div class="form-group">
+                    <label id="labelName">Full Name *</label>
+                    <input type="text" id="fullName" placeholder="Your name" required>
+                    <div class="error" id="nameError"></div>
+                </div>
+                <div class="form-group">
+                    <label id="labelPhone">Phone Number *</label>
+                    <div class="phone-input-group">
+                        <select id="countryCode" class="country-select"></select>
+                        <input type="tel" id="phone" placeholder="9876543210" required>
+                    </div>
+                    <div class="error" id="phoneError"></div>
+                </div>
+                <button class="btn btn-primary" id="startQuizBtn"></button>
+            </div>
+
+            <!-- Quiz -->
+            <div id="quizContainer" style="display: none;">
+                <div class="question-section" data-question="0">
+                    <div class="question-number" id="qnum-0"></div>
+                    <div class="question-title" id="qtitle-0"></div>
+                    <div class="options" id="qopts-0"></div>
+                </div>
+                <div class="question-section" data-question="1">
+                    <div class="question-number" id="qnum-1"></div>
+                    <div class="question-title" id="qtitle-1"></div>
+                    <div class="options" id="qopts-1"></div>
+                </div>
+                <div class="question-section" data-question="2">
+                    <div class="question-number" id="qnum-2"></div>
+                    <div class="question-title" id="qtitle-2"></div>
+                    <div class="options" id="qopts-2"></div>
+                </div>
+                <div class="question-section" data-question="3">
+                    <div class="question-number" id="qnum-3"></div>
+                    <div class="question-title" id="qtitle-3"></div>
+                    <div class="options" id="qopts-3"></div>
+                </div>
+                <div class="question-section" data-question="4">
+                    <div class="question-number" id="qnum-4"></div>
+                    <div class="question-title" id="qtitle-4"></div>
+                    <div class="options" id="qopts-4"></div>
+                </div>
+            </div>
+
+            <!-- Results -->
+            <div class="result-section" id="resultSection">
+                <div class="score-circle" id="scoreCircle">—</div>
+                <div class="score-label" id="scoreLabel"></div>
+                <div class="score-sub" id="scoreSub"></div>
+            </div>
+
+            <!-- Nav Buttons (shown during quiz only) -->
+            <div class="nav-buttons" id="navButtons" style="display: none;">
+                <button class="btn btn-back" id="backBtn" style="display:none;"></button>
+                <button class="btn btn-primary btn-next" id="nextBtn"></button>
+            </div>
+
+            <!-- Success -->
+            <div class="success-message" id="successMessage">
+                <div style="font-size: 3em; margin-bottom: 15px;">✅</div>
+                <h2 id="successTitle" style="color:#333; margin-bottom: 8px;"></h2>
+                <p id="successSub" style="color:#999;"></p>
+            </div>
+
+            <div class="step-indicator" id="stepIndicator"></div>
+        </div>
+    </div>
+
+    <script>
+        // ─── TRANSLATIONS ───────────────────────────────────────────────
+        const t = {
+            en: {
+                headerTitle: 'Fitness Challenge',
+                headerSubtitle: 'Discover your fitness score in 60 seconds',
+                formStep: 'Enter your details to begin',
+                startQuiz: 'Start Quiz →',
+                questions: [
+                    {
+                        title: 'How often do you exercise?',
+                        options: ['❌ Never', '🏃 1-2 times a week', '⚡ 3+ times a week']
+                    },
+                    {
+                        title: "What's your main fitness goal?",
+                        options: ['💨 Lose weight', '💪 Build strength', '🧘 Stay flexible & healthy']
+                    },
+                    {
+                        title: "How's your energy level throughout the day?",
+                        options: ['😴 Low — I feel tired often', '😐 Average — depends on the day', '⚡ High — I feel energetic']
+                    },
+                    {
+                        title: 'How many hours do you sleep each night?',
+                        options: ['😴 Less than 6 hours', '🛌 6–8 hours', '✨ 8+ hours']
+                    },
+                    {
+                        title: "How would you describe your diet?",
+                        options: ['🍕 Poor — lots of junk food', '🥗 Average — mixed', '💚 Healthy — balanced meals']
+                    }
+                ],
+                questionLabel: 'Question',
+                of: 'of',
+                next: 'Next →',
+                back: '← Back',
+                seeResults: 'See My Results →',
+                scoreFit: 'You are %s% fit! 🔥',
+                scoreUnlock: 'Enter your details to unlock your personalized fitness plan',
+                labelName: 'Full Name *',
+                labelPhone: 'Phone Number *',
+                namePlaceholder: 'Your name',
+                phonePlaceholder: '9876543210',
+                submitBtn: 'Unlock My Fitness Plan',
+                nameError: 'Name is required',
+                phoneError: 'Phone must be 7–15 digits',
+                successTitle: 'Welcome!',
+                successSub: 'Redirecting to your personalized plan...',
+            },
+            hi: {
+                headerTitle: 'फिटनेस चैलेंज',
+                headerSubtitle: '60 सेकंड में अपना फिटनेस स्कोर जानें',
+                formStep: 'शुरू करने के लिए अपना विवरण दर्ज करें',
+                startQuiz: 'क्विज़ शुरू करें →',
+                questions: [
+                    {
+                        title: 'आप कितनी बार व्यायाम करते हैं?',
+                        options: ['❌ कभी नहीं', '🏃 हफ्ते में 1-2 बार', '⚡ हफ्ते में 3+ बार']
+                    },
+                    {
+                        title: 'आपका मुख्य फिटनेस लक्ष्य क्या है?',
+                        options: ['💨 वजन कम करना', '💪 ताकत बढ़ाना', '🧘 लचीला और स्वस्थ रहना']
+                    },
+                    {
+                        title: 'दिनभर आपका ऊर्जा स्तर कैसा रहता है?',
+                        options: ['😴 कम — अक्सर थकान लगती है', '😐 सामान्य — दिन पर निर्भर करता है', '⚡ अधिक — मैं ऊर्जावान महसूस करता/करती हूँ']
+                    },
+                    {
+                        title: 'आप रात में कितने घंटे सोते हैं?',
+                        options: ['😴 6 घंटे से कम', '🛌 6–8 घंटे', '✨ 8+ घंटे']
+                    },
+                    {
+                        title: 'आपका खान-पान कैसा है?',
+                        options: ['🍕 खराब — बहुत जंक फूड', '🥗 सामान्य — मिला-जुला खाना', '💚 स्वस्थ — संतुलित भोजन']
+                    }
+                ],
+                questionLabel: 'प्रश्न',
+                of: '/',
+                next: 'आगे →',
+                back: '← वापस',
+                seeResults: 'परिणाम देखें →',
+                scoreFit: 'आप %s% फिट हैं! 🔥',
+                scoreUnlock: 'अपना व्यक्तिगत फिटनेस प्लान पाने के लिए विवरण दर्ज करें',
+                labelName: 'पूरा नाम *',
+                labelPhone: 'फोन नंबर *',
+                namePlaceholder: 'आपका नाम',
+                phonePlaceholder: '9876543210',
+                submitBtn: 'मेरा फिटनेस प्लान अनलॉक करें',
+                nameError: 'नाम आवश्यक है',
+                phoneError: 'फोन नंबर 7–15 अंकों का होना चाहिए',
+                successTitle: 'स्वागत है!',
+                successSub: 'आपके व्यक्तिगत प्लान पर जा रहे हैं...',
+            }
+        };
+
+        // ─── STATE ───────────────────────────────────────────────────────
+        let lang = localStorage.getItem('quizLang') || 'en';
+        let currentQuestion = 0;
+        let answers = [];
+        let selectedCountry = '+91';
+        let quizScore = 0;
+        let tempUser = { name: '', phone: '' };
+
+        // ─── COUNTRY CODES ───────────────────────────────────────────────
+        const countryCodes = [
+            { code: '+91', flag: '🇮🇳', name: 'India' },
+            { code: '+1',  flag: '🇺🇸', name: 'US / Canada' },
+            { code: '+44', flag: '🇬🇧', name: 'UK' },
+            { code: '+61', flag: '🇦🇺', name: 'Australia' },
+            { code: '+86', flag: '🇨🇳', name: 'China' },
+            { code: '+81', flag: '🇯🇵', name: 'Japan' },
+            { code: '+82', flag: '🇰🇷', name: 'S. Korea' },
+            { code: '+60', flag: '🇲🇾', name: 'Malaysia' },
+            { code: '+65', flag: '🇸🇬', name: 'Singapore' },
+            { code: '+62', flag: '🇮🇩', name: 'Indonesia' },
+            { code: '+55', flag: '🇧🇷', name: 'Brazil' },
+            { code: '+27', flag: '🇿🇦', name: 'S. Africa' },
+            { code: '+966', flag: '🇸🇦', name: 'Saudi Arabia' },
+            { code: '+971', flag: '🇦🇪', name: 'UAE' },
+            { code: '+33', flag: '🇫🇷', name: 'France' },
+            { code: '+49', flag: '🇩🇪', name: 'Germany' },
+            { code: '+39', flag: '🇮🇹', name: 'Italy' },
+            { code: '+34', flag: '🇪🇸', name: 'Spain' },
+            { code: '+31', flag: '🇳🇱', name: 'Netherlands' },
+        ];
+
+        function initCountryCodes() {
+            const select = document.getElementById('countryCode');
+            countryCodes.forEach(c => {
+                const opt = document.createElement('option');
+                opt.value = c.code;
+                opt.textContent = `${c.flag} ${c.code}`;
+                if (c.code === '+91') opt.selected = true;
+                select.appendChild(opt);
+            });
+            select.addEventListener('change', e => selectedCountry = e.target.value);
+        }
+
+        async function detectCountry() {
+            try {
+                const res = await fetch('https://ipapi.co/json/');
+                const data = await res.json();
+                const cc = data.country_calling_code;
+                const select = document.getElementById('countryCode');
+                select.value = cc;
+                selectedCountry = cc;
+            } catch { /* default +91 */ }
+        }
+
+        // ─── LANGUAGE ────────────────────────────────────────────────────
+        function setLang(newLang) {
+            lang = newLang;
+            localStorage.setItem('quizLang', lang);
+
+            // Toggle button styles
+            document.getElementById('btnEn').classList.toggle('active', lang === 'en');
+            document.getElementById('btnHi').classList.toggle('active', lang === 'hi');
+
+            // Toggle Hindi font class on card
+            document.querySelector('.card').classList.toggle('lang-hi', lang === 'hi');
+
+            applyTranslations();
+        }
+
+        function applyTranslations() {
+            const T = t[lang];
+
+            document.getElementById('headerTitle').textContent = T.headerTitle;
+            document.getElementById('headerSubtitle').textContent = T.headerSubtitle;
+
+            // Render all questions
+            T.questions.forEach((q, i) => {
+                document.getElementById(`qnum-${i}`).textContent =
+                    `${T.questionLabel} ${i + 1} ${T.of} 5`;
+                document.getElementById(`qtitle-${i}`).textContent = q.title;
+
+                const optsContainer = document.getElementById(`qopts-${i}`);
+                // Preserve selected state while re-rendering
+                const selectedVal = optsContainer.querySelector('.option.selected')?.dataset.value;
+                optsContainer.innerHTML = q.options.map((opt, j) => `
+                    <button class="option${selectedVal == j+1 ? ' selected' : ''}" data-value="${j + 1}">
+                        ${opt}
+                    </button>
+                `).join('');
+            });
+
+            // Nav buttons
+            updateButtons();
+
+            // Form labels
+            document.getElementById('formStepLabel').textContent = T.formStep;
+            document.getElementById('labelName').textContent   = T.labelName;
+            document.getElementById('labelPhone').textContent  = T.labelPhone;
+            document.getElementById('fullName').placeholder    = T.namePlaceholder;
+            document.getElementById('startQuizBtn').textContent = T.startQuiz;
+
+            // Result section (if visible)
+            if (quizScore) {
+                document.getElementById('scoreLabel').textContent = T.scoreFit.replace('%s', quizScore);
+                document.getElementById('scoreSub').textContent   = T.scoreUnlock;
+            }
+
+            // Step indicator
+            const leadFormActive = document.getElementById('leadForm').classList.contains('active');
+            if (!leadFormActive) {
+                document.getElementById('stepIndicator').textContent =
+                    `${T.questionLabel} ${currentQuestion + 1} ${T.of} 5`;
+            }
+
+            // Success message
+            document.getElementById('successTitle').textContent = T.successTitle;
+            document.getElementById('successSub').textContent   = T.successSub;
+        }
+
+        // ─── QUIZ LOGIC ──────────────────────────────────────────────────
+        function updateProgress() {
+            document.getElementById('progressFill').style.width = `${(currentQuestion / 5) * 100}%`;
+        }
+
+        function showQuestion(index) {
+            document.querySelectorAll('.question-section').forEach(el => el.classList.remove('active'));
+            document.querySelector(`[data-question="${index}"]`).classList.add('active');
+            const T = t[lang];
+            document.getElementById('stepIndicator').textContent =
+                `${T.questionLabel} ${index + 1} ${T.of} 5`;
+            updateProgress();
+            updateButtons();
+        }
+
+        function updateButtons() {
+            const T = t[lang];
+            const backBtn = document.getElementById('backBtn');
+            const nextBtn = document.getElementById('nextBtn');
+
+            backBtn.textContent = T.back;
+            backBtn.style.display = currentQuestion === 0 ? 'none' : 'block';
+            nextBtn.textContent   = currentQuestion === 4 ? T.seeResults : T.next;
+        }
+
+        document.addEventListener('click', e => {
+            if (e.target.classList.contains('option')) {
+                const section = e.target.closest('.question-section');
+                section.querySelectorAll('.option').forEach(o => o.classList.remove('selected'));
+                e.target.classList.add('selected');
+            }
+        });
+
+        document.getElementById('nextBtn').addEventListener('click', () => {
+            const selected = document.querySelector(`[data-question="${currentQuestion}"] .option.selected`);
+            if (!selected) {
+                alert(lang === 'hi' ? 'कृपया एक विकल्प चुनें' : 'Please select an option');
+                return;
+            }
+            answers[currentQuestion] = parseInt(selected.dataset.value);
+
+            if (currentQuestion < 4) {
+                currentQuestion++;
+                showQuestion(currentQuestion);
+            } else {
+                showResults();
+            }
+        });
+
+        document.getElementById('backBtn').addEventListener('click', () => {
+            if (currentQuestion > 0) {
+                currentQuestion--;
+                showQuestion(currentQuestion);
+            }
+        });
+
+        function calculateScore() {
+            const total = answers.reduce((s, v) => s + v, 0);
+            return Math.round((total / 15) * 100);
+        }
+
+        function showResults() {
+            const T = t[lang];
+            quizScore = calculateScore();
+
+            // Save lead to localStorage
+            const refId = tempUser.name.split(' ')[0].toLowerCase().replace(/[^a-z]/g, '') +
+                          '_' + Math.random().toString(36).slice(2, 6);
+            const params = new URLSearchParams(window.location.search);
+            const referredBy = params.get('ref') || null;
+
+            const lead = {
+                id: refId,
+                name: tempUser.name,
+                phone: tempUser.phone,
+                score: quizScore,
+                lang,
+                referredBy,
+                timestamp: new Date().toISOString(),
+                referrals: []
+            };
+
+            let leads = JSON.parse(localStorage.getItem('leads')) || [];
+            if (referredBy) {
+                leads = leads.map(l => {
+                    if (l.id === referredBy) l.referrals.push(refId);
+                    return l;
+                });
+            }
+            leads.push(lead);
+            localStorage.setItem('leads', JSON.stringify(leads));
+
+            // Show score
+            document.getElementById('scoreCircle').textContent = quizScore + '%';
+            document.getElementById('scoreLabel').textContent  = T.scoreFit.replace('%s', quizScore);
+            document.getElementById('scoreSub').textContent    = T.scoreUnlock;
+
+            document.getElementById('quizContainer').style.display = 'none';
+            document.getElementById('resultSection').classList.add('active');
+            document.getElementById('navButtons').style.display = 'none';
+            document.getElementById('stepIndicator').style.display = 'none';
+
+            setTimeout(() => {
+                window.location.href = `referral.html?id=${refId}`;
+            }, 2500);
+        }
+
+        // ─── START QUIZ (Form Submit) ───────────────────────────────────
+        document.getElementById('startQuizBtn').addEventListener('click', () => {
+            const T = t[lang];
+            const name  = document.getElementById('fullName').value.trim();
+            const phone = document.getElementById('phone').value.trim();
+            let valid = true;
+
+            if (!name) {
+                document.getElementById('nameError').textContent = T.nameError;
+                valid = false;
+            } else { document.getElementById('nameError').textContent = ''; }
+
+            if (!phone || phone.length < 7 || phone.length > 15) {
+                document.getElementById('phoneError').textContent = T.phoneError;
+                valid = false;
+            } else { document.getElementById('phoneError').textContent = ''; }
+
+            if (!valid) return;
+
+            // Store user data temporarily
+            tempUser.name = name;
+            tempUser.phone = selectedCountry + ' ' + phone;
+
+            // Hide form, show quiz
+            document.getElementById('leadForm').classList.remove('active');
+            document.getElementById('quizContainer').style.display = 'block';
+            document.getElementById('navButtons').style.display = 'flex';
+            document.getElementById('stepIndicator').style.display = 'block';
+
+            // Start quiz
+            currentQuestion = 0;
+            answers = [];
+            showQuestion(0);
+        });
+
+        // ─── INIT ────────────────────────────────────────────────────────
+        window.addEventListener('load', () => {
+            initCountryCodes();
+            detectCountry();
+            applyTranslations();
+            // Form is shown first, quiz starts after user fills in details
+
+            // Apply saved language
+            document.getElementById(lang === 'hi' ? 'btnHi' : 'btnEn').classList.add('active');
+            document.getElementById(lang === 'hi' ? 'btnEn' : 'btnHi').classList.remove('active');
+            if (lang === 'hi') document.querySelector('.card').classList.add('lang-hi');
+        });
+    </script>
+</body>
+</html>

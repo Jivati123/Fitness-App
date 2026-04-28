@@ -965,9 +965,6 @@
                     document.getElementById('phoneError').textContent = T.phoneValidation;
                 }
                 valid = false;
-            } else if (checkDuplicatePhone(phone, selectedCountry)) {
-                document.getElementById('phoneError').textContent = T.duplicatePhone;
-                valid = false;
             }
 
             if (!valid) return;
@@ -976,41 +973,44 @@
             tempUser.name = name;
             tempUser.phone = sanitizePhone(phone, selectedCountry);
 
-            // Generate referral ID
-            currentRefId = generateRefId(name);
+            // Check if phone already exists (retake scenario)
+            const leads = JSON.parse(localStorage.getItem('leads')) || [];
+            const existingLead = leads.find(l => l.phone === tempUser.phone);
 
-            // Create and save lead
-            const lead = {
-                id: currentRefId,
-                name: tempUser.name.split(' ')[0],
-                phone: tempUser.phone,
-                score: quizScore,
-                lang,
-                referredBy,
-                timestamp: new Date().toISOString(),
-                referrals: []
-            };
-
-            // Update referrer's referral list
-            if (referredBy) {
-                const leads = JSON.parse(localStorage.getItem('leads')) || [];
-                leads.forEach(l => {
-                    if (l.id === referredBy) {
-                        if (!l.referrals) l.referrals = [];
-                        l.referrals.push(currentRefId);
-                    }
-                });
+            if (existingLead) {
+                // User is retaking quiz - update their existing entry
+                currentRefId = existingLead.id;
+                existingLead.score = quizScore;
+                existingLead.timestamp = new Date().toISOString();
+                existingLead.lang = lang;
                 localStorage.setItem('leads', JSON.stringify(leads));
             } else {
-                const leads = JSON.parse(localStorage.getItem('leads')) || [];
-                leads.push(lead);
-                localStorage.setItem('leads', JSON.stringify(leads));
-            }
+                // New user - create new entry
+                currentRefId = generateRefId(name);
+                const newLead = {
+                    id: currentRefId,
+                    name: tempUser.name.split(' ')[0],
+                    phone: tempUser.phone,
+                    score: quizScore,
+                    lang,
+                    referredBy,
+                    timestamp: new Date().toISOString(),
+                    referrals: []
+                };
 
-            // Add new lead if referrer exists
-            if (referredBy) {
-                const leads = JSON.parse(localStorage.getItem('leads')) || [];
-                leads.push(lead);
+                // Add new lead
+                leads.push(newLead);
+
+                // Update referrer's referral list if applicable
+                if (referredBy) {
+                    leads.forEach(l => {
+                        if (l.id === referredBy) {
+                            if (!l.referrals) l.referrals = [];
+                            l.referrals.push(currentRefId);
+                        }
+                    });
+                }
+
                 localStorage.setItem('leads', JSON.stringify(leads));
             }
 

@@ -1026,10 +1026,17 @@
             const params = new URLSearchParams(window.location.search);
             referredBy = params.get('ref') || null;
 
+            initCountryCodes();
+            detectCountry();
+
+            // Apply saved language
+            document.getElementById(lang === 'hi' ? 'btnHi' : 'btnEn').classList.add('active');
+            document.getElementById(lang === 'hi' ? 'btnEn' : 'btnHi').classList.remove('active');
+            if (lang === 'hi') document.querySelector('.card').classList.add('lang-hi');
+
             // Load session if available (quiz in progress)
             if (loadSessionQuiz()) {
                 // Quiz was in progress, restore it
-                currentQuestion = 0;
                 document.getElementById('leadForm').classList.remove('active');
                 document.getElementById('quizContainer').style.display = 'block';
                 document.getElementById('navButtons').style.display = 'flex';
@@ -1041,14 +1048,7 @@
                 document.getElementById('scoreTierSection').classList.remove('active');
             }
 
-            initCountryCodes();
-            detectCountry();
             applyTranslations();
-
-            // Apply saved language
-            document.getElementById(lang === 'hi' ? 'btnHi' : 'btnEn').classList.add('active');
-            document.getElementById(lang === 'hi' ? 'btnEn' : 'btnHi').classList.remove('active');
-            if (lang === 'hi') document.querySelector('.card').classList.add('lang-hi');
 
             // Handle overlay click to close error popup
             document.getElementById('errorOverlay').addEventListener('click', closeErrorPopup);

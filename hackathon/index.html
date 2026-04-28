@@ -458,7 +458,7 @@
                     <span id="tierText">Fit</span>
                 </div>
                 <p id="tierMessage" style="color: var(--text-sec); font-size: 0.95em; margin: 20px 0;"></p>
-                <button class="btn btn-primary" id="continueToFormBtn" onclick="showLeadForm()"></button>
+                <button class="btn btn-primary" id="continueToFormBtn" onclick="saveLead()"></button>
             </div>
 
             <!-- Lead Form -->
@@ -583,7 +583,7 @@
                 phoneError: 'Phone must be 7–15 digits',
                 successTitle: 'Welcome!',
                 successSub: 'Redirecting to your personalized plan...',
-                continueToForm: 'Continue →',
+                continueToForm: 'View My Reward →',
                 tierTitle: 'Your Fitness Score',
                 tierBeginner: 'Beginner',
                 tierAverage: 'Average',
@@ -638,7 +638,7 @@
                 phoneError: 'फोन नंबर 7–15 अंकों का होना चाहिए',
                 successTitle: 'स्वागत है!',
                 successSub: 'आपके व्यक्तिगत प्लान पर जा रहे हैं...',
-                continueToForm: 'आगे बढ़ें →',
+                continueToForm: 'मेरा पुरस्कार देखें →',
                 tierTitle: 'आपका फिटनेस स्कोर',
                 tierBeginner: 'शुरुआती',
                 tierAverage: 'औसत',
@@ -939,6 +939,57 @@
             applyTranslations();
         }
 
+        // ─── SAVE LEAD AND REDIRECT TO REWARD PAGE ──────────────────────
+        function saveLead() {
+            // Generate referral ID
+            currentRefId = generateRefId(tempUser.name);
+
+            // Check if phone already exists (retake scenario)
+            const leads = JSON.parse(localStorage.getItem('leads')) || [];
+            const existingLead = leads.find(l => l.phone === tempUser.phone);
+
+            if (existingLead) {
+                // User is retaking quiz - update their existing entry
+                currentRefId = existingLead.id;
+                existingLead.score = quizScore;
+                existingLead.timestamp = new Date().toISOString();
+                existingLead.lang = lang;
+                localStorage.setItem('leads', JSON.stringify(leads));
+            } else {
+                // New user - create new entry
+                const newLead = {
+                    id: currentRefId,
+                    name: tempUser.name.split(' ')[0],
+                    phone: tempUser.phone,
+                    score: quizScore,
+                    lang,
+                    referredBy,
+                    timestamp: new Date().toISOString(),
+                    referrals: []
+                };
+
+                // Add new lead
+                leads.push(newLead);
+
+                // Update referrer's referral list if applicable
+                if (referredBy) {
+                    leads.forEach(l => {
+                        if (l.id === referredBy) {
+                            if (!l.referrals) l.referrals = [];
+                            l.referrals.push(currentRefId);
+                        }
+                    });
+                }
+
+                localStorage.setItem('leads', JSON.stringify(leads));
+            }
+
+            clearSessionQuiz();
+            setTimeout(() => {
+                window.location.href = `referral.html?id=${currentRefId}`;
+            }, 500);
+        }
+
         // ─── START QUIZ (Lead Form Submit) ──────────────────────────────
         document.getElementById('startQuizBtn').addEventListener('click', () => {
             const T = t[lang];
@@ -973,51 +1024,16 @@
             tempUser.name = name;
             tempUser.phone = sanitizePhone(phone, selectedCountry);
 
-            // Check if phone already exists (retake scenario)
-            const leads = JSON.parse(localStorage.getItem('leads')) || [];
-            const existingLead = leads.find(l => l.phone === tempUser.phone);
+            // Hide form and show quiz
+            document.getElementById('leadForm').classList.remove('active');
+            document.getElementById('quizContainer').style.display = 'block';
+            document.getElementById('navButtons').style.display = 'flex';
+            document.getElementById('stepIndicator').style.display = 'block';
 
-            if (existingLead) {
-                // User is retaking quiz - update their existing entry
-                currentRefId = existingLead.id;
-                existingLead.score = quizScore;
-                existingLead.timestamp = new Date().toISOString();
-                existingLead.lang = lang;
-                localStorage.setItem('leads', JSON.stringify(leads));
-            } else {
-                // New user - create new entry
-                currentRefId = generateRefId(name);
-                const newLead = {
-                    id: currentRefId,
-                    name: tempUser.name.split(' ')[0],
-                    phone: tempUser.phone,
-                    score: quizScore,
-                    lang,
-                    referredBy,
-                    timestamp: new Date().toISOString(),
-                    referrals: []
-                };
-
-                // Add new lead
-                leads.push(newLead);
-
-                // Update referrer's referral list if applicable
-                if (referredBy) {
-                    leads.forEach(l => {
-                        if (l.id === referredBy) {
-                            if (!l.referrals) l.referrals = [];
-                            l.referrals.push(currentRefId);
-                        }
-                    });
-                }
-
-                localStorage.setItem('leads', JSON.stringify(leads));
-            }
-
-            clearSessionQuiz();
-            setTimeout(() => {
-                window.location.href = `referral.html?id=${currentRefId}`;
-            }, 500);
+            // Reset quiz
+            currentQuestion = 0;
+            answers = [];
+            showQuestion(0);
         });
 
         // ─── INIT ────────────────────────────────────────────────────────

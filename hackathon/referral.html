@@ -170,7 +170,15 @@
             font-weight: 700;
             color: var(--text-primary);
             text-align: center;
-            margin-bottom: 15px;
+            margin-bottom: 10px;
+        }
+
+        .share-description {
+            font-size: 0.9em;
+            color: var(--text-sec);
+            text-align: center;
+            line-height: 1.5;
+            margin-bottom: 20px;
         }
 
         .referral-code {
@@ -415,8 +423,8 @@
             </div>
 
             <div class="share-section">
-                <div class="share-section-title" id="shareTitle">Share Your Score</div>
-                <div class="referral-code" id="referralCode">—</div>
+                <div class="share-section-title" id="shareTitle">Share This Quiz</div>
+                <div class="share-description" id="shareDescription">Share this quiz with your friends and family and help them discover their fitness level and get benefits from this challenge.</div>
                 <div class="share-buttons">
                     <button class="share-btn share-whatsapp" onclick="shareWhatsapp()">
                         <span>💬</span>
@@ -456,7 +464,8 @@
                 reward1: '14-Day Free Yoga Challenge',
                 reward2: 'Exclusive Digital Resource Books',
                 reward3: 'Personalized Fitness Plan',
-                shareTitle: 'Share Your Score',
+                shareTitle: 'Share This Quiz',
+                shareDescription: 'Share this quiz with your friends and family and help them discover their fitness level and get benefits from this challenge.',
                 whatsappText: 'WhatsApp',
                 copyText: 'Copy Link',
                 backBtn: 'Take Quiz Again',
@@ -478,7 +487,8 @@
                 reward1: '14-दिन का निःशुल्क योग चुनौती',
                 reward2: 'एक्सक्लूसिव डिजिटल संसाधन पुस्तकें',
                 reward3: 'व्यक्तिगत फिटनेस योजना',
-                shareTitle: 'अपना स्कोर साझा करें',
+                shareTitle: 'इस क्विज़ को साझा करें',
+                shareDescription: 'इस क्विज़ को अपने दोस्तों और परिवार के साथ साझा करें और उन्हें अपने फिटनेस स्तर की खोज करने में मदद करें।',
                 whatsappText: 'व्हाट्सऐप',
                 copyText: 'लिंक कॉपी करें',
                 backBtn: 'फिर से क्विज लें',
@@ -507,6 +517,7 @@
             document.getElementById('reward2').textContent = t.reward2;
             document.getElementById('reward3').textContent = t.reward3;
             document.getElementById('shareTitle').textContent = t.shareTitle;
+            document.getElementById('shareDescription').textContent = t.shareDescription;
             document.getElementById('whatsappText').textContent = t.whatsappText;
             document.getElementById('copyText').textContent = t.copyText;
             document.getElementById('backBtn').textContent = t.backBtn;
@@ -575,8 +586,8 @@
             if (!currentLead) return;
             const link = getReferralLink();
             const msg = currentLang === 'en'
-                ? 'I just scored ' + currentLead.score + '% on the Jivati Fitness Challenge! Try it: ' + link
-                : 'मैंने जिवाति फिटनेस चैलेंज पर ' + currentLead.score + '% स्कोर किया! अपना स्कोर देखें: ' + link;
+                ? 'I found this interesting fitness quiz 💪 You should try it too: ' + link
+                : 'मैंने यह दिलचस्प फिटनेस क्विज़ खोजी है 💪 आप भी इसे आजमाएं: ' + link;
             window.open('https://wa.me/?text=' + encodeURIComponent(msg), '_blank');
         }
 

@@ -3,16 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Your Personalized Fitness Plan</title>
+    <title>Your Fitness Reward - Jivati Challenge</title>
     <style>
         :root {
             --bg-primary:   #F7F5F2;
             --bg-card:      #FFFFFF;
+            --bg-alt:       #EFEAE4;
             --text-primary: #2E2E2E;
             --text-sec:     #6B6B6B;
+            --text-dim:     #A0A0A0;
             --cta:          #FF7A00;
             --cta-hover:    #E66A00;
             --cta-text:     #FFFFFF;
+            --accent-soft:  #FFD9B3;
+            --success:      #27AE60;
             --border:       #E4DDD5;
         }
 
@@ -29,90 +33,216 @@
 
         header {
             text-align: center;
-            margin-bottom: 40px;
+            margin-bottom: 30px;
             margin-top: 20px;
         }
 
         h1 {
-            font-size: 2.4em;
+            font-size: 2.2em;
             font-weight: 800;
             color: var(--text-primary);
-            margin-bottom: 12px;
+            margin-bottom: 8px;
         }
 
         .subtitle {
-            font-size: 1.05em;
+            font-size: 1em;
             color: var(--text-sec);
-            margin-bottom: 20px;
         }
 
         .card {
             background: var(--bg-card);
             border-radius: 16px;
-            padding: 36px;
+            padding: 32px;
             box-shadow: 0 4px 24px rgba(46,46,46,0.08);
             margin-bottom: 30px;
             border: 1px solid var(--border);
-            text-align: center;
         }
 
-        .score-display {
-            font-size: 3.5em;
+        .score-box {
+            text-align: center;
+            padding: 30px;
+            background: linear-gradient(135deg, var(--cta) 0%, #FF9D33 100%);
+            border-radius: 16px;
+            color: var(--cta-text);
+            margin-bottom: 25px;
+            box-shadow: 0 8px 24px rgba(255,122,0,0.3);
+        }
+
+        .score-number {
+            font-size: 3em;
             font-weight: 800;
-            color: var(--cta);
+            margin-bottom: 8px;
+        }
+
+        .tier-badge {
+            display: inline-block;
+            padding: 8px 16px;
+            border-radius: 20px;
+            background: rgba(255,255,255,0.2);
+            font-size: 0.9em;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+        .tier-message {
+            font-size: 0.95em;
+            opacity: 0.95;
+            line-height: 1.5;
+        }
+
+        .section {
+            margin-bottom: 28px;
+        }
+
+        .section-title {
+            font-size: 1.15em;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .reward-box {
+            background: #FFF9E6;
+            border: 2px solid var(--cta);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
             margin-bottom: 20px;
         }
 
-        .score-message {
-            font-size: 1.2em;
-            color: var(--text-primary);
-            margin-bottom: 30px;
-            line-height: 1.6;
-        }
-
-        .referral-section {
-            background: #FFF5ED;
-            padding: 24px;
-            border-radius: 12px;
-            margin-bottom: 24px;
-            border: 1px solid #FFD9B3;
-        }
-
-        .referral-title {
-            font-size: 1.1em;
+        .reward-title {
+            font-size: 1.05em;
             font-weight: 700;
             color: var(--text-primary);
             margin-bottom: 12px;
         }
 
-        .referral-link {
-            background: var(--bg-card);
+        .reward-text {
+            color: var(--text-sec);
+            font-size: 0.9em;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+
+        .reward-list {
+            text-align: left;
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 12px;
+        }
+
+        .reward-item {
+            padding: 8px 0;
+            color: var(--text-primary);
+            font-size: 0.95em;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .reward-item:last-child {
+            border-bottom: none;
+        }
+
+        .reward-item::before {
+            content: "✓";
+            color: var(--success);
+            font-weight: 700;
+            font-size: 1.1em;
+            flex-shrink: 0;
+        }
+
+        .share-section {
+            background: #F9F9F9;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .share-section-title {
+            font-size: 1em;
+            font-weight: 700;
+            color: var(--text-primary);
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+        .referral-code {
+            background: white;
             padding: 12px;
             border-radius: 8px;
-            word-break: break-all;
-            font-family: monospace;
+            border: 2px solid var(--cta);
+            font-family: 'Courier New', monospace;
+            font-weight: 600;
             color: var(--cta);
-            margin-bottom: 12px;
-            font-size: 0.9em;
+            text-align: center;
+            word-break: break-all;
+            margin: 12px 0;
+            font-size: 0.85em;
+        }
+
+        .share-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .share-btn {
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.85em;
+            transition: all 0.25s;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            flex-direction: column;
+        }
+
+        .share-whatsapp {
+            background: #25D366;
+            color: white;
+        }
+
+        .share-whatsapp:hover {
+            background: #1FAD51;
+        }
+
+        .share-copy {
+            background: var(--cta);
+            color: white;
+        }
+
+        .share-copy:hover {
+            background: var(--cta-hover);
         }
 
         .btn {
-            display: inline-block;
-            padding: 14px 28px;
+            width: 100%;
+            padding: 14px;
             border: none;
             border-radius: 10px;
-            font-size: 1.05em;
+            font-size: 1em;
             font-weight: 700;
             cursor: pointer;
             transition: all 0.25s;
-            text-decoration: none;
+            margin-bottom: 10px;
         }
 
         .btn-primary {
             background: var(--cta);
             color: var(--cta-text);
-            width: 100%;
-            margin-bottom: 12px;
         }
 
         .btn-primary:hover {
@@ -122,162 +252,365 @@
         }
 
         .btn-secondary {
-            background: var(--bg-primary);
+            background: white;
             color: var(--cta);
             border: 2px solid var(--cta);
-            width: 100%;
         }
 
         .btn-secondary:hover {
             background: #FFF5ED;
         }
 
-        .loading {
+        .unlock-overlay {
             display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.6);
+            z-index: 999;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .unlock-overlay.show {
+            display: block;
+        }
+
+        .unlock-popup {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 40px 30px;
+            border-radius: 20px;
             text-align: center;
+            z-index: 1000;
+            max-width: 90%;
+            animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .unlock-popup.show {
+            display: block;
+        }
+
+        .unlock-icon {
+            font-size: 3em;
+            margin-bottom: 15px;
+        }
+
+        .unlock-title {
+            font-size: 1.3em;
+            font-weight: 800;
+            color: var(--text-primary);
+            margin-bottom: 12px;
+        }
+
+        .unlock-message {
             color: var(--text-sec);
+            font-size: 0.95em;
+            line-height: 1.6;
+            margin-bottom: 25px;
         }
 
-        .spinner {
-            width: 40px;
-            height: 40px;
-            border: 4px solid var(--border);
-            border-top: 4px solid var(--cta);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin: 20px auto;
+        .unlock-resources {
+            text-align: left;
+            background: #F9F9F9;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
         }
 
-        @keyframes spin {
-            to { transform: rotate(360deg); }
+        .unlock-resource-item {
+            padding: 10px 0;
+            color: var(--text-primary);
+            font-size: 0.9em;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .unlock-resource-item::before {
+            content: "📚";
+            font-size: 1.1em;
+            flex-shrink: 0;
+        }
+
+        .unlock-btn {
+            background: var(--success);
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 0.95em;
+        }
+
+        .unlock-btn:hover {
+            background: #229954;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes popIn {
+            from { transform: translate(-50%, -50%) scale(0.8); opacity: 0; }
+            to { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+        }
+
+        .referral-count {
+            text-align: center;
+            padding: 12px;
+            background: #E8F5E9;
+            border-radius: 8px;
+            color: var(--success);
+            font-weight: 600;
+            font-size: 0.9em;
+            margin-top: 15px;
+        }
+
+        .lang-hi .section-title,
+        .lang-hi .reward-title,
+        .lang-hi .share-section-title,
+        .lang-hi .unlock-title,
+        .lang-hi .btn {
+            font-family: 'Noto Sans Devanagari', 'Mangal', sans-serif;
         }
     </style>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
     <div class="container">
         <header>
-            <h1>🎉 Results</h1>
-            <p class="subtitle">Your personalized fitness plan is ready!</p>
+            <h1>🎉 <span id="headerTitle">Your Fitness Reward</span></h1>
+            <p class="subtitle" id="headerSubtitle">Congratulations on completing the quiz!</p>
         </header>
 
         <div class="card">
-            <div class="loading" id="loading">
-                <div class="spinner"></div>
-                <p>Loading your fitness plan...</p>
+            <div class="score-box">
+                <div class="score-number" id="scoreDisplay">—</div>
+                <div class="tier-badge" id="tierBadge">Fit</div>
+                <div class="tier-message" id="tierMessage">Amazing score! You are maintaining a healthy lifestyle.</div>
             </div>
 
-            <div id="content" style="display: none;">
-                <div class="score-display" id="scoreDisplay">—</div>
-                <div class="score-message" id="scoreMessage">
-                    <p id="greeting"></p>
+            <div class="section">
+                <div class="reward-box">
+                    <div class="reward-title" id="rewardTitle">Share and Unlock Your Reward</div>
+                    <div class="reward-text" id="rewardText">Share this quiz with 5 friends to unlock your 14-Day Free Yoga Challenge and exclusive resources!</div>
+                    <div class="referral-count">
+                        <span id="referralCount">0 friends</span> referred so far
+                    </div>
                 </div>
 
-                <div class="referral-section">
-                    <div class="referral-title">📢 Share & Earn</div>
-                    <p style="color: var(--text-sec); margin-bottom: 12px;">Invite friends to take the quiz and earn rewards!</p>
-                    <div class="referral-link" id="referralLink"></div>
-                    <button class="btn btn-secondary" onclick="copyLink()">Copy Link</button>
+                <div class="reward-list">
+                    <div class="reward-item" id="reward1">14-Day Free Yoga Challenge</div>
+                    <div class="reward-item" id="reward2">Exclusive Digital Resource Books</div>
+                    <div class="reward-item" id="reward3">Personalized Fitness Plan</div>
                 </div>
-
-                <div id="stats" style="margin-bottom: 24px;"></div>
-
-                <button class="btn btn-primary" onclick="retakQuiz()">Retake Quiz</button>
-                <button class="btn btn-secondary" onclick="shareResults()">Share Results</button>
             </div>
+
+            <div class="share-section">
+                <div class="share-section-title" id="shareTitle">Share Your Score</div>
+                <div class="referral-code" id="referralCode">—</div>
+                <div class="share-buttons">
+                    <button class="share-btn share-whatsapp" onclick="shareWhatsapp()">
+                        <span>💬</span>
+                        <span id="whatsappText">WhatsApp</span>
+                    </button>
+                    <button class="share-btn share-copy" onclick="copyReferralLink()">
+                        <span>🔗</span>
+                        <span id="copyText">Copy Link</span>
+                    </button>
+                </div>
+            </div>
+
+            <button class="btn btn-primary" id="backBtn" onclick="goHome()"></button>
         </div>
     </div>
 
+    <div class="unlock-overlay" id="unlockOverlay"></div>
+    <div class="unlock-popup" id="unlockPopup">
+        <div class="unlock-icon">🎉</div>
+        <div class="unlock-title" id="unlockTitle">Congratulations!</div>
+        <div class="unlock-message" id="unlockMessage">You have unlocked your 14-Day Free Yoga Challenge!</div>
+        <div class="unlock-resources">
+            <div class="unlock-resource-item" id="resource1">14-Day Free Yoga Challenge</div>
+            <div class="unlock-resource-item" id="resource2">Exclusive Digital Resource Books</div>
+            <div class="unlock-resource-item" id="resource3">Personalized Fitness Plan Guide</div>
+        </div>
+        <button class="unlock-btn" onclick="closeUnlockPopup()" id="unlockBtn">Got it!</button>
+    </div>
+
     <script>
-        const urlParams = new URLSearchParams(window.location.search);
-        const refId = urlParams.get('id');
-
-        window.addEventListener('load', () => {
-            if (refId) {
-                // Simulate loading delay for better UX
-                setTimeout(displayResults, 1500);
-            } else {
-                document.getElementById('loading').style.display = 'none';
-                document.getElementById('content').style.display = 'block';
-                document.getElementById('scoreMessage').innerHTML =
-                    '<p>Take the quiz first to get your personalized fitness plan!</p>' +
-                    '<button class="btn btn-primary" onclick="window.location.href=\'/index.html\'">Take Quiz</button>';
+        const translations = {
+            en: {
+                headerTitle: 'Your Fitness Reward',
+                headerSubtitle: 'Congratulations on completing the quiz!',
+                rewardTitle: 'Share and Unlock Your Reward',
+                rewardText: 'Share this quiz with 5 friends to unlock your 14-Day Free Yoga Challenge and exclusive resources!',
+                reward1: '14-Day Free Yoga Challenge',
+                reward2: 'Exclusive Digital Resource Books',
+                reward3: 'Personalized Fitness Plan',
+                shareTitle: 'Share Your Score',
+                whatsappText: 'WhatsApp',
+                copyText: 'Copy Link',
+                backBtn: 'Take Quiz Again',
+                unlockTitle: 'Congratulations!',
+                unlockMessage: 'You have unlocked your 14-Day Free Yoga Challenge and exclusive resources!',
+                resource1: '14-Day Free Yoga Challenge',
+                resource2: 'Exclusive Digital Resource Books',
+                resource3: 'Personalized Fitness Plan Guide',
+                unlockBtn: 'Got it!',
+                beginnerMsg: 'You are just starting your fitness journey. Share and inspire others!',
+                averageMsg: 'You are on the right track! Share with friends to unlock your yoga challenge.',
+                fitMsg: 'Amazing score! You are maintaining a healthy lifestyle. Share and inspire others!',
+            },
+            hi: {
+                headerTitle: 'आपका फिटनेस पुरस्कार',
+                headerSubtitle: 'क्विज पूरा करने के लिए बधाई!',
+                rewardTitle: 'अपना पुरस्कार साझा करें और अनलॉक करें',
+                rewardText: 'इस क्विज को 5 दोस्तों के साथ साझा करें और अपना 14-दिन का निःशुल्क योग चुनौती अनलॉक करें!',
+                reward1: '14-दिन का निःशुल्क योग चुनौती',
+                reward2: 'एक्सक्लूसिव डिजिटल संसाधन पुस्तकें',
+                reward3: 'व्यक्तिगत फिटनेस योजना',
+                shareTitle: 'अपना स्कोर साझा करें',
+                whatsappText: 'व्हाट्सऐप',
+                copyText: 'लिंक कॉपी करें',
+                backBtn: 'फिर से क्विज लें',
+                unlockTitle: 'बधाई!',
+                unlockMessage: 'आपने अपना 14-दिन का निःशुल्क योग चुनौती अनलॉक कर दी है!',
+                resource1: '14-दिन का निःशुल्क योग चुनौती',
+                resource2: 'एक्सक्लूसिव डिजिटल संसाधन पुस्तकें',
+                resource3: 'व्यक्तिगत फिटनेस योजना गाइड',
+                unlockBtn: 'ठीक है!',
+                beginnerMsg: 'आप अपनी फिटनेस यात्रा शुरू कर रहे हैं। दूसरों को प्रेरित करने के लिए साझा करें!',
+                averageMsg: 'आप सही रास्ते पर हैं! अपनी योग चुनौती अनलॉक करने के लिए दोस्तों के साथ साझा करें।',
+                fitMsg: 'शानदार स्कोर! आप एक स्वस्थ जीवनशैली बनाए रख रहे हैं। साझा करें और दूसरों को प्रेरित करें!',
             }
-        });
+        };
 
-        function displayResults() {
-            const leads = JSON.parse(localStorage.getItem('leads') || '[]');
-            const lead = leads.find(l => l.id === refId);
+        let currentLang = localStorage.getItem('quizLang') || 'en';
+        let currentLead = null;
 
-            if (!lead) {
-                document.getElementById('loading').style.display = 'none';
-                document.getElementById('scoreMessage').innerHTML =
-                    '<p>Unable to load your results. Please take the quiz again.</p>';
+        function applyTranslations() {
+            const t = translations[currentLang];
+            document.getElementById('headerTitle').textContent = t.headerTitle;
+            document.getElementById('headerSubtitle').textContent = t.headerSubtitle;
+            document.getElementById('rewardTitle').textContent = t.rewardTitle;
+            document.getElementById('rewardText').textContent = t.rewardText;
+            document.getElementById('reward1').textContent = t.reward1;
+            document.getElementById('reward2').textContent = t.reward2;
+            document.getElementById('reward3').textContent = t.reward3;
+            document.getElementById('shareTitle').textContent = t.shareTitle;
+            document.getElementById('whatsappText').textContent = t.whatsappText;
+            document.getElementById('copyText').textContent = t.copyText;
+            document.getElementById('backBtn').textContent = t.backBtn;
+            document.getElementById('unlockTitle').textContent = t.unlockTitle;
+            document.getElementById('unlockMessage').textContent = t.unlockMessage;
+            document.getElementById('resource1').textContent = t.resource1;
+            document.getElementById('resource2').textContent = t.resource2;
+            document.getElementById('resource3').textContent = t.resource3;
+            document.getElementById('unlockBtn').textContent = t.unlockBtn;
+            document.querySelector('.card').classList.toggle('lang-hi', currentLang === 'hi');
+        }
+
+        function getScoreTier(score) {
+            if (score <= 30) return { tier: 'beginner', emoji: '😬' };
+            if (score <= 60) return { tier: 'average', emoji: '🙂' };
+            return { tier: 'fit', emoji: '💪' };
+        }
+
+        function getTierMessage(tier) {
+            const t = translations[currentLang];
+            return t[tier + 'Msg'] || '';
+        }
+
+        function loadUserData() {
+            const params = new URLSearchParams(window.location.search);
+            const userId = params.get('id');
+
+            if (!userId) {
+                document.getElementById('scoreDisplay').textContent = '—';
                 return;
             }
 
-            // Display score
-            document.getElementById('scoreDisplay').textContent = lead.score + '%';
+            const leads = JSON.parse(localStorage.getItem('leads')) || [];
+            currentLead = leads.find(l => l.id === userId);
 
-            // Personalized message based on score
-            let message = '';
-            if (lead.score >= 80) {
-                message = `Excellent work, ${lead.name}! You're a fitness champion! 🏆`;
-            } else if (lead.score >= 60) {
-                message = `Great effort, ${lead.name}! You're on the right track! 💪`;
-            } else if (lead.score >= 40) {
-                message = `Good start, ${lead.name}! Keep improving! 🚀`;
-            } else {
-                message = `Time to level up, ${lead.name}! You've got this! 💪`;
+            if (currentLead) {
+                currentLang = currentLead.lang || 'en';
+                localStorage.setItem('quizLang', currentLang);
+                applyTranslations();
+
+                document.getElementById('scoreDisplay').textContent = currentLead.score + '%';
+                const tierInfo = getScoreTier(currentLead.score);
+                const tierName = currentLang === 'en' ?
+                    (tierInfo.tier === 'beginner' ? 'Beginner' : tierInfo.tier === 'average' ? 'Average' : 'Fit') :
+                    (tierInfo.tier === 'beginner' ? 'शुरुआती' : tierInfo.tier === 'average' ? 'औसत' : 'फिट');
+                document.getElementById('tierBadge').textContent = tierInfo.emoji + ' ' + tierName;
+                document.getElementById('tierMessage').textContent = getTierMessage(tierInfo.tier);
+                document.getElementById('referralCode').textContent = currentLead.id;
+
+                const referralCount = (currentLead.referrals || []).length;
+                const countText = referralCount === 1 ? '1 friend' : referralCount + ' friends';
+                document.getElementById('referralCount').textContent = currentLang === 'en' ? countText : referralCount + ' दोस्त';
+
+                if (referralCount >= 5) {
+                    setTimeout(() => showUnlockPopup(), 800);
+                }
             }
-
-            document.getElementById('greeting').textContent = message;
-
-            // Referral link
-            const baseUrl = window.location.origin;
-            const refLink = `${baseUrl}/index.html?ref=${refId}`;
-            document.getElementById('referralLink').textContent = refLink;
-
-            // Stats
-            const referrals = lead.referrals || [];
-            const statsHtml = `
-                <div style="padding: 16px; background: #F0F0F0; border-radius: 8px;">
-                    <p style="color: var(--text-sec); font-size: 0.9em; margin-bottom: 8px;">Your Referrals</p>
-                    <div style="font-size: 1.8em; font-weight: 700; color: var(--cta);">${referrals.length}</div>
-                    <p style="color: var(--text-sec); font-size: 0.85em;">friends invited</p>
-                </div>
-            `;
-            document.getElementById('stats').innerHTML = statsHtml;
-
-            // Show content, hide loading
-            document.getElementById('loading').style.display = 'none';
-            document.getElementById('content').style.display = 'block';
         }
 
-        function copyLink() {
-            const link = document.getElementById('referralLink').textContent;
+        function getReferralLink() {
+            const baseUrl = window.location.origin + window.location.pathname.replace('referral.html', 'index.html');
+            return baseUrl + '?ref=' + currentLead.id;
+        }
+
+        function shareWhatsapp() {
+            if (!currentLead) return;
+            const link = getReferralLink();
+            const msg = currentLang === 'en'
+                ? 'I just scored ' + currentLead.score + '% on the Jivati Fitness Challenge! Try it: ' + link
+                : 'मैंने जिवाति फिटनेस चैलेंज पर ' + currentLead.score + '% स्कोर किया! अपना स्कोर देखें: ' + link;
+            window.open('https://wa.me/?text=' + encodeURIComponent(msg), '_blank');
+        }
+
+        function copyReferralLink() {
+            if (!currentLead) return;
+            const link = getReferralLink();
             navigator.clipboard.writeText(link).then(() => {
-                alert('Link copied to clipboard!');
-            }).catch(() => {
-                alert('Unable to copy. Please copy manually: ' + link);
+                const btn = document.querySelector('.share-copy');
+                btn.textContent = currentLang === 'en' ? 'Copied!' : 'कॉपी किया गया!';
+                setTimeout(() => {
+                    btn.innerHTML = '<span>🔗</span><span id="copyText">' + (currentLang === 'en' ? 'Copy Link' : 'लिंक कॉपी करें') + '</span>';
+                }, 2000);
             });
         }
 
-        function shareResults() {
-            const text = `I just completed the Fitness Challenge Quiz! Check my score and take it yourself: ${window.location.href}`;
-            if (navigator.share) {
-                navigator.share({
-                    title: 'Fitness Challenge',
-                    text: text,
-                    url: window.location.href
-                });
-            } else {
-                alert(text);
-            }
+        function showUnlockPopup() {
+            document.getElementById('unlockOverlay').classList.add('show');
+            document.getElementById('unlockPopup').classList.add('show');
         }
 
-        function retakQuiz() {
-            window.location.href = '/index.html';
+        function closeUnlockPopup() {
+            document.getElementById('unlockOverlay').classList.remove('show');
+            document.getElementById('unlockPopup').classList.remove('show');
         }
+
+        function goHome() {
+            window.location.href = 'index.html';
+        }
+
+        window.addEventListener('load', () => {
+            loadUserData();
+            applyTranslations();
+            document.getElementById('unlockOverlay').addEventListener('click', closeUnlockPopup);
+        });
     </script>
 </body>
 </html>

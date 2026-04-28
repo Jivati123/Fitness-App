@@ -253,6 +253,106 @@
         .result-section { display: none; text-align: center; }
         .result-section.active { display: block; animation: slideIn 0.3s ease; }
 
+        /* ── Score Tier Badge ────────────────────────────────────── */
+        .score-tier-section {
+            display: none;
+            text-align: center;
+            animation: slideIn 0.3s ease;
+        }
+
+        .score-tier-section.active {
+            display: block;
+        }
+
+        .tier-badge {
+            display: inline-block;
+            padding: 20px 40px;
+            border-radius: 16px;
+            margin: 20px 0;
+            font-size: 1.1em;
+            font-weight: 700;
+        }
+
+        .tier-beginner {
+            background: #FFE8D6;
+            color: #D35400;
+        }
+
+        .tier-average {
+            background: #FFF9E6;
+            color: #F39C12;
+        }
+
+        .tier-fit {
+            background: #D4EDDA;
+            color: #27AE60;
+        }
+
+        .tier-emoji {
+            font-size: 2.5em;
+            margin-right: 10px;
+        }
+
+        /* ── Error Popup ────────────────────────────────────────── */
+        .error-popup {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            z-index: 1000;
+            text-align: center;
+            max-width: 90%;
+        }
+
+        .error-popup.show {
+            display: block;
+            animation: slideIn 0.3s ease;
+        }
+
+        .error-popup-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 999;
+        }
+
+        .error-popup-overlay.show {
+            display: block;
+        }
+
+        .error-popup h3 {
+            color: #D94F3D;
+            margin-bottom: 15px;
+        }
+
+        .error-popup p {
+            color: var(--text-sec);
+            margin-bottom: 20px;
+        }
+
+        .error-popup-btn {
+            background: var(--cta);
+            color: white;
+            border: none;
+            padding: 10px 30px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .error-popup-btn:hover {
+            background: var(--cta-hover);
+        }
+
         .score-circle {
             width: 150px;
             height: 150px;
@@ -339,8 +439,30 @@
         </div>
 
         <div class="card">
-            <!-- Lead Form (SHOWN FIRST) -->
-            <div class="lead-form active" id="leadForm">
+            <!-- Error Popup -->
+            <div class="error-popup-overlay" id="errorOverlay"></div>
+            <div class="error-popup" id="errorPopup">
+                <h3 id="errorTitle">⚠️ Invalid Input</h3>
+                <p id="errorMessage"></p>
+                <button class="error-popup-btn" onclick="closeErrorPopup()">OK</button>
+            </div>
+
+            <!-- Score Tier Display (shown after quiz, before form) -->
+            <div class="score-tier-section" id="scoreTierSection">
+                <div style="margin-bottom: 20px;">
+                    <h2 style="color: var(--text-primary); margin-bottom: 10px;" id="tierTitle">Your Fitness Score</h2>
+                </div>
+                <div class="score-circle" id="scoreTierCircle">—</div>
+                <div class="tier-badge" id="tierBadge">
+                    <span class="tier-emoji" id="tierEmoji">💪</span>
+                    <span id="tierText">Fit</span>
+                </div>
+                <p id="tierMessage" style="color: var(--text-sec); font-size: 0.95em; margin: 20px 0;"></p>
+                <button class="btn btn-primary" id="continueToFormBtn" onclick="showLeadForm()"></button>
+            </div>
+
+            <!-- Lead Form -->
+            <div class="lead-form" id="leadForm">
                 <div style="margin-bottom: 20px;">
                     <p id="formStepLabel" style="color: var(--text-sec); font-size: 0.95em; text-align: center;"></p>
                 </div>
@@ -414,6 +536,8 @@
     </div>
 
     <script>
+        // ─── ENHANCED REFERRAL FUNNEL SYSTEM WITH LOCALSTORAGE ─────
+
         // ─── TRANSLATIONS ───────────────────────────────────────────────
         const t = {
             en: {
@@ -459,6 +583,17 @@
                 phoneError: 'Phone must be 7–15 digits',
                 successTitle: 'Welcome!',
                 successSub: 'Redirecting to your personalized plan...',
+                continueToForm: 'Continue →',
+                tierTitle: 'Your Fitness Score',
+                tierBeginner: 'Beginner',
+                tierAverage: 'Average',
+                tierFit: 'Fit',
+                beginnerMsg: 'Great start on your fitness journey! Keep pushing and you\'ll see amazing results.',
+                averageMsg: 'You\'re on the right track! A few more lifestyle changes will level up your fitness.',
+                fitMsg: 'Impressive! You\'re maintaining a healthy lifestyle. Keep it up! 💪',
+                phoneValidation: 'Please enter a valid phone number',
+                phoneIndiaValidation: 'Indian phone numbers must be exactly 10 digits',
+                duplicatePhone: 'This phone number is already registered. Try another one.',
             },
             hi: {
                 headerTitle: 'फिटनेस चैलेंज',
@@ -503,6 +638,17 @@
                 phoneError: 'फोन नंबर 7–15 अंकों का होना चाहिए',
                 successTitle: 'स्वागत है!',
                 successSub: 'आपके व्यक्तिगत प्लान पर जा रहे हैं...',
+                continueToForm: 'आगे बढ़ें →',
+                tierTitle: 'आपका फिटनेस स्कोर',
+                tierBeginner: 'शुरुआती',
+                tierAverage: 'औसत',
+                tierFit: 'फिट',
+                beginnerMsg: 'आपकी फिटनेस यात्रा शुरू करने के लिए बहुत अच्छा! आगे बढ़ते रहें और आप शानदार परिणाम देखेंगे।',
+                averageMsg: 'आप सही रास्ते पर हैं! कुछ और जीवनशैली में बदलाव आपको फिट बना देंगे।',
+                fitMsg: 'प्रभावशाली! आप एक स्वस्थ जीवनशैली बनाए रख रहे हैं। ऐसे ही बने रहें! 💪',
+                phoneValidation: 'कृपया एक मान्य फोन नंबर दर्ज करें',
+                phoneIndiaValidation: 'भारतीय फोन नंबर बिल्कुल 10 अंकों का होना चाहिए',
+                duplicatePhone: 'यह फोन नंबर पहले से पंजीकृत है। कोई अन्य नंबर आज़माएं।',
             }
         };
 
@@ -513,6 +659,8 @@
         let selectedCountry = '+91';
         let quizScore = 0;
         let tempUser = { name: '', phone: '' };
+        let referredBy = null;
+        let currentRefId = null;
 
         // ─── COUNTRY CODES ───────────────────────────────────────────────
         const countryCodes = [
@@ -558,6 +706,79 @@
                 select.value = cc;
                 selectedCountry = cc;
             } catch { /* default +91 */ }
+        }
+
+        // ─── UTILITY FUNCTIONS ──────────────────────────────────────────
+        function showErrorPopup(message) {
+            const T = t[lang];
+            document.getElementById('errorMessage').textContent = message;
+            document.getElementById('errorPopup').classList.add('show');
+            document.getElementById('errorOverlay').classList.add('show');
+        }
+
+        function closeErrorPopup() {
+            document.getElementById('errorPopup').classList.remove('show');
+            document.getElementById('errorOverlay').classList.remove('show');
+        }
+
+        function generateRefId(name) {
+            const firstName = name.split(' ')[0].toLowerCase().replace(/[^a-z]/g, '');
+            const timestamp = Date.now().toString(36).slice(-4);
+            return firstName + '_' + timestamp;
+        }
+
+        function validatePhone(phone, dialCode) {
+            const digitsOnly = phone.replace(/\D/g, '');
+            if (dialCode === '+91') {
+                return digitsOnly.length === 10;
+            }
+            return digitsOnly.length >= 6 && digitsOnly.length <= 15;
+        }
+
+        function sanitizePhone(phone, dialCode) {
+            return dialCode + phone.replace(/\D/g, '');
+        }
+
+        function checkDuplicatePhone(phone, dialCode) {
+            const sanitized = sanitizePhone(phone, dialCode);
+            const leads = JSON.parse(localStorage.getItem('leads')) || [];
+            return leads.some(l => l.phone === sanitized);
+        }
+
+        function getScoreTier(score) {
+            if (score <= 30) return { tier: 'beginner', emoji: '😬', color: 'tier-beginner' };
+            if (score <= 60) return { tier: 'average', emoji: '🙂', color: 'tier-average' };
+            return { tier: 'fit', emoji: '💪', color: 'tier-fit' };
+        }
+
+        function getTierMessage(tier, lang) {
+            const T = t[lang];
+            const key = 'tier' + tier.charAt(0).toUpperCase() + tier.slice(1) + 'Msg';
+            return T[key] || '';
+        }
+
+        function saveSessionQuiz() {
+            sessionStorage.setItem('quizSession', JSON.stringify({
+                currentQuestion,
+                answers,
+                selectedCountry
+            }));
+        }
+
+        function loadSessionQuiz() {
+            const session = sessionStorage.getItem('quizSession');
+            if (session) {
+                const data = JSON.parse(session);
+                currentQuestion = data.currentQuestion;
+                answers = data.answers;
+                selectedCountry = data.selectedCountry;
+                return true;
+            }
+            return false;
+        }
+
+        function clearSessionQuiz() {
+            sessionStorage.removeItem('quizSession');
         }
 
         // ─── LANGUAGE ────────────────────────────────────────────────────
@@ -689,16 +910,79 @@
         function showResults() {
             const T = t[lang];
             quizScore = calculateScore();
+            const tierInfo = getScoreTier(quizScore);
 
-            // Save lead to localStorage
-            const refId = tempUser.name.split(' ')[0].toLowerCase().replace(/[^a-z]/g, '') +
-                          '_' + Math.random().toString(36).slice(2, 6);
-            const params = new URLSearchParams(window.location.search);
-            const referredBy = params.get('ref') || null;
+            // Show score tier section
+            document.getElementById('quizContainer').style.display = 'none';
+            document.getElementById('navButtons').style.display = 'none';
+            document.getElementById('stepIndicator').style.display = 'none';
+            document.getElementById('resultSection').classList.remove('active');
 
+            // Update tier display
+            document.getElementById('scoreTierCircle').textContent = quizScore + '%';
+            document.getElementById('tierBadge').className = 'tier-badge ' + tierInfo.color;
+            document.getElementById('tierEmoji').textContent = tierInfo.emoji;
+            document.getElementById('tierText').textContent = T['tier' + tierInfo.tier.charAt(0).toUpperCase() + tierInfo.tier.slice(1)];
+            document.getElementById('tierMessage').textContent = getTierMessage(tierInfo.tier, lang);
+            document.getElementById('continueToFormBtn').textContent = T.continueToForm;
+
+            document.getElementById('scoreTierSection').classList.add('active');
+
+            // Save to session for restoration if needed
+            saveSessionQuiz();
+        }
+
+        // ─── SHOW LEAD FORM (after quiz) ────────────────────────────────
+        function showLeadForm() {
+            document.getElementById('scoreTierSection').classList.remove('active');
+            document.getElementById('leadForm').classList.add('active');
+            applyTranslations();
+        }
+
+        // ─── START QUIZ (Lead Form Submit) ──────────────────────────────
+        document.getElementById('startQuizBtn').addEventListener('click', () => {
+            const T = t[lang];
+            const name  = document.getElementById('fullName').value.trim();
+            const phone = document.getElementById('phone').value.trim();
+            let valid = true;
+
+            // Clear previous errors
+            document.getElementById('nameError').textContent = '';
+            document.getElementById('phoneError').textContent = '';
+
+            if (!name) {
+                document.getElementById('nameError').textContent = T.nameError;
+                valid = false;
+            }
+
+            if (!phone) {
+                document.getElementById('phoneError').textContent = T.phoneError;
+                valid = false;
+            } else if (!validatePhone(phone, selectedCountry)) {
+                if (selectedCountry === '+91') {
+                    document.getElementById('phoneError').textContent = T.phoneIndiaValidation;
+                } else {
+                    document.getElementById('phoneError').textContent = T.phoneValidation;
+                }
+                valid = false;
+            } else if (checkDuplicatePhone(phone, selectedCountry)) {
+                document.getElementById('phoneError').textContent = T.duplicatePhone;
+                valid = false;
+            }
+
+            if (!valid) return;
+
+            // Store user data
+            tempUser.name = name;
+            tempUser.phone = sanitizePhone(phone, selectedCountry);
+
+            // Generate referral ID
+            currentRefId = generateRefId(name);
+
+            // Create and save lead
             const lead = {
-                id: refId,
-                name: tempUser.name,
+                id: currentRefId,
+                name: tempUser.name.split(' ')[0],
                 phone: tempUser.phone,
                 score: quizScore,
                 lang,
@@ -707,77 +991,67 @@
                 referrals: []
             };
 
-            let leads = JSON.parse(localStorage.getItem('leads')) || [];
+            // Update referrer's referral list
             if (referredBy) {
-                leads = leads.map(l => {
-                    if (l.id === referredBy) l.referrals.push(refId);
-                    return l;
+                const leads = JSON.parse(localStorage.getItem('leads')) || [];
+                leads.forEach(l => {
+                    if (l.id === referredBy) {
+                        if (!l.referrals) l.referrals = [];
+                        l.referrals.push(currentRefId);
+                    }
                 });
+                localStorage.setItem('leads', JSON.stringify(leads));
+            } else {
+                const leads = JSON.parse(localStorage.getItem('leads')) || [];
+                leads.push(lead);
+                localStorage.setItem('leads', JSON.stringify(leads));
             }
-            leads.push(lead);
-            localStorage.setItem('leads', JSON.stringify(leads));
 
-            // Show score
-            document.getElementById('scoreCircle').textContent = quizScore + '%';
-            document.getElementById('scoreLabel').textContent  = T.scoreFit.replace('%s', quizScore);
-            document.getElementById('scoreSub').textContent    = T.scoreUnlock;
+            // Add new lead if referrer exists
+            if (referredBy) {
+                const leads = JSON.parse(localStorage.getItem('leads')) || [];
+                leads.push(lead);
+                localStorage.setItem('leads', JSON.stringify(leads));
+            }
 
-            document.getElementById('quizContainer').style.display = 'none';
-            document.getElementById('resultSection').classList.add('active');
-            document.getElementById('navButtons').style.display = 'none';
-            document.getElementById('stepIndicator').style.display = 'none';
-
+            clearSessionQuiz();
             setTimeout(() => {
-                window.location.href = `referral.html?id=${refId}`;
-            }, 2500);
-        }
-
-        // ─── START QUIZ (Form Submit) ───────────────────────────────────
-        document.getElementById('startQuizBtn').addEventListener('click', () => {
-            const T = t[lang];
-            const name  = document.getElementById('fullName').value.trim();
-            const phone = document.getElementById('phone').value.trim();
-            let valid = true;
-
-            if (!name) {
-                document.getElementById('nameError').textContent = T.nameError;
-                valid = false;
-            } else { document.getElementById('nameError').textContent = ''; }
-
-            if (!phone || phone.length < 7 || phone.length > 15) {
-                document.getElementById('phoneError').textContent = T.phoneError;
-                valid = false;
-            } else { document.getElementById('phoneError').textContent = ''; }
-
-            if (!valid) return;
-
-            // Store user data temporarily
-            tempUser.name = name;
-            tempUser.phone = selectedCountry + ' ' + phone;
-
-            // Hide form, show quiz
-            document.getElementById('leadForm').classList.remove('active');
-            document.getElementById('quizContainer').style.display = 'block';
-            document.getElementById('navButtons').style.display = 'flex';
-            document.getElementById('stepIndicator').style.display = 'block';
-
-            // Start quiz
-            currentQuestion = 0;
-            answers = [];
-            showQuestion(0);
+                window.location.href = `referral.html?id=${currentRefId}`;
+            }, 500);
         });
 
         // ─── INIT ────────────────────────────────────────────────────────
         window.addEventListener('load', () => {
+            // Detect referral parameter
+            const params = new URLSearchParams(window.location.search);
+            referredBy = params.get('ref') || null;
+
+            // Load session if available (quiz in progress)
+            if (loadSessionQuiz()) {
+                // Quiz was in progress, restore it
+                currentQuestion = 0;
+                document.getElementById('leadForm').classList.remove('active');
+                document.getElementById('quizContainer').style.display = 'block';
+                document.getElementById('navButtons').style.display = 'flex';
+                document.getElementById('stepIndicator').style.display = 'block';
+                showQuestion(0);
+            } else {
+                // Fresh start - show form
+                document.getElementById('leadForm').classList.add('active');
+                document.getElementById('scoreTierSection').classList.remove('active');
+            }
+
             initCountryCodes();
             detectCountry();
             applyTranslations();
-            // Form is shown first, quiz starts after user fills in details
 
             // Apply saved language
             document.getElementById(lang === 'hi' ? 'btnHi' : 'btnEn').classList.add('active');
             document.getElementById(lang === 'hi' ? 'btnEn' : 'btnHi').classList.remove('active');
             if (lang === 'hi') document.querySelector('.card').classList.add('lang-hi');
+
+            // Handle overlay click to close error popup
+            document.getElementById('errorOverlay').addEventListener('click', closeErrorPopup);
         });
     </script>
 </body>
